@@ -1,31 +1,42 @@
 const express = require('express');
 
-const mockStocks = require('../mockStocks');
-
 const router = express.Router();
 
-const escapeHtml = (value) => String(value)
-  .replaceAll('&', '&amp;')
-  .replaceAll('<', '&lt;')
-  .replaceAll('>', '&gt;')
-  .replaceAll('"', '&quot;')
-  .replaceAll("'", '&#039;');
-
-const renderStockRows = (stocks) => stocks.map((stock) => `
-  <tr data-ticker="${escapeHtml(stock.ticker)}">
-    <td>
-      <div class="ticker-cell">
-        <span class="ticker">${escapeHtml(stock.ticker)}</span>
-        <span class="company">${escapeHtml(stock.name)}</span>
-      </div>
-    </td>
-    <td>${escapeHtml(stock.exchange)}</td>
-    <td>${escapeHtml(stock.sector)}</td>
-    <td class="price" data-price>${stock.price.toFixed(2)}</td>
-    <td class="change neutral" data-change>0.00</td>
-    <td class="updated" data-updated>Waiting</td>
-  </tr>
-`).join('');
+router.get('/login', (req, res) => {
+  res.type('html').send(`<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Stock Broker</title>
+    <link rel="stylesheet" href="/styles/stocks.css">
+  </head>
+  <body>
+    <main class="auth-shell">
+      <section class="auth-panel" aria-labelledby="login-title">
+        <p class="eyebrow">Stock Broker</p>
+        <h1 id="login-title">Sign in</h1>
+        <form class="login-form" data-login-form>
+          <label for="email">Email</label>
+          <div class="input-row">
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              placeholder="you@example.com"
+              required
+            >
+            <button type="submit">Continue</button>
+          </div>
+          <p class="form-message" data-message></p>
+        </form>
+      </section>
+    </main>
+    <script src="/scripts/login.js"></script>
+  </body>
+</html>`);
+});
 
 router.get('/', (req, res) => {
   res.type('html').send(`<!doctype html>
@@ -33,17 +44,21 @@ router.get('/', (req, res) => {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Stock Broker Dashboard</title>
+    <title>Stocks | Stock Broker</title>
     <link rel="stylesheet" href="/styles/stocks.css">
   </head>
   <body>
     <main class="shell">
       <header class="topbar">
         <div>
-          <p class="eyebrow">Phase 1</p>
+          <p class="eyebrow">Market</p>
           <h1>Stocks</h1>
         </div>
-        <div class="feed-status" data-status>Connecting</div>
+        <div class="header-actions">
+          <div class="user-pill" data-user>Loading user</div>
+          <div class="feed-status" data-status>Connecting</div>
+          <button class="secondary-button" type="button" data-logout>Logout</button>
+        </div>
       </header>
 
       <section class="market-panel" aria-label="Stock prices">
@@ -55,11 +70,14 @@ router.get('/', (req, res) => {
               <th scope="col">Sector</th>
               <th scope="col">Price</th>
               <th scope="col">Move</th>
-              <th scope="col">Updated</th>
+              <th scope="col">Status</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
-          <tbody>
-            ${renderStockRows(mockStocks)}
+          <tbody data-stock-table>
+            <tr>
+              <td colspan="7" class="empty-state">Loading stocks</td>
+            </tr>
           </tbody>
         </table>
       </section>

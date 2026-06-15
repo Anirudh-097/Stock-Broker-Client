@@ -5,6 +5,7 @@ const cors = require('cors');
 const healthRoutes = require('./routes/healthRoutes');
 const authRoutes = require('./routes/authRoutes');
 const pageRoutes = require('./routes/pageRoutes');
+const stockRoutes = require('./routes/stockRoutes');
 const subscriptionRoutes = require(
   './routes/subRoutes'
 );
@@ -23,5 +24,6 @@ app.use('/', pageRoutes);
 app.use('/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/sub', subscriptionRoutes);
+app.use('/api/stocks', stockRoutes);
 
 module.exports = app;
