@@ -15,6 +15,8 @@ docker compose up --build
 
 The API listens on `http://localhost:5000`.
 
+Open `http://localhost:5000/login` to sign in with an email address. New users are created in MongoDB with no stock subscriptions, then redirected to `http://localhost:5000/` to view and buy stocks.
+
 ## Backend Development
 
 ```sh
@@ -36,6 +38,7 @@ Set these environment variables when running outside Docker:
 - `GET /health/db`: database connection health.
 - `POST /api/auth/login`: accepts `{ "email": "user@example.com" }` and returns a JWT.
 - `GET /api/auth/me`: returns the authenticated user.
+- `GET /api/stocks`: lists supported stock metadata for the page.
 - `GET /api/sub`: lists authenticated user subscriptions.
 - `POST /api/sub`: accepts `{ "ticker": "GOOG" }` for supported stocks.
 
