@@ -15,6 +15,8 @@ docker compose up --build
 
 The API listens on `http://localhost:5000`.
 
+The phase 1 stock page is available at `http://localhost:5000/`.
+
 ## Backend Development
 
 ```sh
@@ -29,6 +31,8 @@ Set these environment variables when running outside Docker:
 - `PORT`: API port, defaults to `5000`.
 - `MONGO_URI`: MongoDB connection string.
 - `JWT_SECRET`: Secret used to sign authentication tokens.
+
+For frontend-only mock development, `MONGO_URI` can be omitted. The stock page and realtime mock prices will still run, but database-backed API routes require MongoDB.
 
 ## API
 

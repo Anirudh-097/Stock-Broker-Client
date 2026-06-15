@@ -14,7 +14,13 @@ const {
 const PORT = process.env.PORT || 5000;
 
 const start = async () => {
-  await connectDB();
+  if (process.env.MONGO_URI) {
+    await connectDB();
+  } else {
+    console.warn(
+      'MONGO_URI is not set; starting without database connection'
+    );
+  }
 
   const server = http.createServer(app);
   const io = new Server(server, {
