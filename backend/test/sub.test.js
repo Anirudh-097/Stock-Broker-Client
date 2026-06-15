@@ -71,6 +71,67 @@ describe('Subscriptions', () => {
   );
 
   test(
+    'trims and normalizes ticker',
+    async () => {
+      User.findByIdAndUpdate.mockResolvedValue(
+        {
+          subscriptions: ['GOOG']
+        }
+      );
+
+      const response =
+        await request(app)
+          .post('/api/sub')
+          .set(
+            'Authorization',
+            `Bearer ${token}`
+          )
+          .send({
+            ticker: ' goog '
+          });
+
+      expect(response.status)
+        .toBe(200);
+
+      expect(User.findByIdAndUpdate)
+        .toHaveBeenCalledWith(
+          '123',
+          {
+            $addToSet: {
+              subscriptions: 'GOOG'
+            }
+          },
+          {
+            new: true
+          }
+        );
+    }
+  );
+
+  test(
+    'returns 404 when subscribing for a missing user',
+    async () => {
+      User.findByIdAndUpdate.mockResolvedValue(
+        null
+      );
+
+      const response =
+        await request(app)
+          .post('/api/sub')
+          .set(
+            'Authorization',
+            `Bearer ${token}`
+          )
+          .send({
+            ticker: 'GOOG'
+          });
+
+      expect(response.status)
+        .toBe(404);
+    }
+  );
+
+  test(
     'returns subscriptions',
     async () => {
       User.findById.mockResolvedValue({
@@ -94,6 +155,24 @@ describe('Subscriptions', () => {
       expect(
         response.body.subscriptions
       ).toHaveLength(2);
+    }
+  );
+
+  test(
+    'returns 404 when fetching subscriptions for a missing user',
+    async () => {
+      User.findById.mockResolvedValue(null);
+
+      const response =
+        await request(app)
+          .get('/api/sub')
+          .set(
+            'Authorization',
+            `Bearer ${token}`
+          );
+
+      expect(response.status)
+        .toBe(404);
     }
   );
 });

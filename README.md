@@ -1,2 +1,50 @@
-# Stock-Broker-Client
-Stock brocker client dashboard
+# Stock Broker Client
+
+Backend API for a stock subscription dashboard.
+
+## Services
+
+- `backend`: Express API for authentication, health checks, and stock subscriptions.
+- `mongodb`: MongoDB database used by the backend.
+
+## Run With Docker
+
+```sh
+docker compose up --build
+```
+
+The API listens on `http://localhost:5000`.
+
+## Backend Development
+
+```sh
+cd backend
+npm install
+npm test
+npm run dev
+```
+
+Set these environment variables when running outside Docker:
+
+- `PORT`: API port, defaults to `5000`.
+- `MONGO_URI`: MongoDB connection string.
+- `JWT_SECRET`: Secret used to sign authentication tokens.
+
+## API
+
+- `GET /health`: basic service health.
+- `GET /health/db`: database connection health.
+- `POST /api/auth/login`: accepts `{ "email": "user@example.com" }` and returns a JWT.
+- `GET /api/auth/me`: returns the authenticated user.
+- `GET /api/sub`: lists authenticated user subscriptions.
+- `POST /api/sub`: accepts `{ "ticker": "GOOG" }` for supported stocks.
+
+## Realtime Stock Prices
+
+Socket.IO is served from the backend. Clients join only the ticker rooms they need:
+
+- `stock:join` with a ticker string such as `"GOOG"` joins `stock:GOOG`.
+- `stock:leave` with a ticker string leaves that ticker room.
+- `stock:price` emits one price update per second to each relevant ticker room only.
+
+Each price tick changes the stock price by a random value from `-5` to `+5`.

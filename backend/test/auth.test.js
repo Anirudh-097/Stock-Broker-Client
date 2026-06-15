@@ -52,6 +52,26 @@ describe('Authentication', () => {
     expect(response.body.token).toBeDefined();
   });
 
+  test('normalizes email before lookup', async () => {
+    User.findOne.mockResolvedValue({
+      _id: '123',
+      email: 'alice@test.com',
+      subscriptions: []
+    });
+
+    const response = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: ' Alice@Test.COM '
+      });
+
+    expect(response.status).toBe(200);
+
+    expect(User.findOne).toHaveBeenCalledWith({
+      email: 'alice@test.com'
+    });
+  });
+
   test('returns existing user', async () => {
     User.findOne.mockResolvedValue({
       _id: '123',
@@ -76,6 +96,17 @@ describe('Authentication', () => {
       .set(
         'Authorization',
         'Bearer invalid-token'
+      );
+
+    expect(response.status).toBe(401);
+  });
+
+  test('rejects malformed authorization header', async () => {
+    const response = await request(app)
+      .get('/api/auth/me')
+      .set(
+        'Authorization',
+        'invalid-token'
       );
 
     expect(response.status).toBe(401);
@@ -107,5 +138,25 @@ describe('Authentication', () => {
     expect(response.body.email).toBe(
       'alice@test.com'
     );
+  });
+
+  test('returns 404 when authenticated user is missing', async () => {
+    const token = jwt.sign(
+      {
+        userId: '123'
+      },
+      process.env.JWT_SECRET
+    );
+
+    User.findById.mockResolvedValue(null);
+
+    const response = await request(app)
+      .get('/api/auth/me')
+      .set(
+        'Authorization',
+        `Bearer ${token}`
+      );
+
+    expect(response.status).toBe(404);
   });
 });
