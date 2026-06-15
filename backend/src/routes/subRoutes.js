@@ -13,14 +13,14 @@ router.post(
     try {
       const { ticker } = req.body;
 
-      if (!ticker) {
+      if (!ticker || typeof ticker !== 'string') {
         return res.status(400).json({
           message: 'Ticker is required'
         });
       }
 
       const normalizedTicker =
-        ticker.toUpperCase();
+        ticker.trim().toUpperCase();
 
       if (
         !SUPPORTED_STOCKS.includes(
@@ -46,6 +46,12 @@ router.post(
           }
         );
 
+      if (!user) {
+        return res.status(404).json({
+          message: 'User not found'
+        });
+      }
+
       return res.status(200).json({
         subscriptions:
           user.subscriptions
@@ -66,6 +72,12 @@ router.get(
       const user = await User.findById(
         req.user.userId
       );
+
+      if (!user) {
+        return res.status(404).json({
+          message: 'User not found'
+        });
+      }
 
       return res.status(200).json({
         subscriptions:
