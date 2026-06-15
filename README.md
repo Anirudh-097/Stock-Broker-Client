@@ -32,6 +32,8 @@ Set these environment variables when running outside Docker:
 - `MONGO_URI`: MongoDB connection string.
 - `JWT_SECRET`: Secret used to sign authentication tokens.
 
+For frontend-only mock development, `MONGO_URI` can be omitted. The stock page and realtime mock prices will still run, but database-backed API routes require MongoDB.
+
 ## API
 
 - `GET /health`: basic service health.
